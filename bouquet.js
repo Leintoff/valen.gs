@@ -526,7 +526,7 @@
   const TAG_LINES = [
     params.get('to') && `for ${cut(params.get('to'))} ♡`,
     params.get('msg') && cut(params.get('msg')),
-    params.get('from') && `love, ${cut(params.get('from'))}`,
+    params.get('from') && `xoxo, ${cut(params.get('from'))}`,
   ].filter(Boolean);
   if (TAG_LINES.length === 1) TAG_LINES.push('');
   if (params.get('to')) document.title = `for ${cut(params.get('to'))} ♡`;

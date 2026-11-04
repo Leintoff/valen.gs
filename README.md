@@ -48,6 +48,8 @@ un punto oscuro se vuelve un `.` y uno clarito se vuelve un `@`.
 
 ## parametros de la url
 
+los params `to`, `msg` y `from` se cortan a 22 caracteres con `Array.from`, para no romper emojis ni unicode.
+
  
 | param | valores | default | que hace |
 | :--- | :--- | :---: | :--- |
@@ -66,8 +68,16 @@ ejemplo para mandar con mensaje:
 ```
 https://leintoff.github.io/valen.gs/?to=Mati&msg=feliz%20cumple&from=Valen&ui=off
 ```
- 
-
+```
+oooooo     oooo       .o.       ooooo        oooooooooooo ooooo      ooo 
+ `888.     .8'       .888.      `888'        `888'     `8 `888b.     `8' 
+  `888.   .8'       .8"888.      888          888          8 `88b.    8  
+   `888. .8'       .8' `888.     888          888oooo8     8   `88b.  8  
+    `888.8'       .88ooo8888.    888          888    "     8     `88b.8  
+     `888'       .8'     `888.   888       o  888       o  8       `888  
+      `8'       o88o     o8888o o888ooooood8 o888ooooood8 o8o        `8  
+                                                                                  
+```
 <br>
 
 <br> <p align="center"> hecho por <a href="https://github.com/Leintoff">Valen G. Spilere</a> ♡ </p>

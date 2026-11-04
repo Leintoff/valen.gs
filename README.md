@@ -43,7 +43,7 @@ una flor son **6 piezas con la misma forma** (`bezierCurveTo`), rotados `k * 60Â
  (cols x rows px)    ->    brillo por pixel   ->   fillText(RAMP[i])
  1 pixel = 1 celda         max(r, g, b)            + glow con blur
 ```
-' .:-=+*cxoaX#%&@'`: de poca luz (`.`) a mucha (`@`)
+' .:-=+*cxoaX#%&@'`: `de poca luz (`.`) a mucha (`@`)
 
 ## parametros de la url
 

@@ -19,6 +19,8 @@ Se puede insertar &to=<user>&from=<user> y &msg= para un tag personalizado c:
 | <kbd>B</kbd> | saca el ribbon |
 | <kbd>C</kbd> | cambia el color |
 
+la idea central es que la animación es una función pura del tiempo :3
+cada flor tiene 3 valores derivados de T en budState(): grow, blush y open. cada flor son 6 piezas que son la misma forma con bezierCurveTo, rotados k*60*open grados, entonces abrir la flor es literalmente rotarlos hacia afuera. el color pasa de verde a rosado a color final con mix(), que interpola en RGB.
 
 <br>
 

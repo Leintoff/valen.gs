@@ -22,7 +22,9 @@ Se puede insertar &to=<user>&from=<user> y &msg= para un tag personalizado c:
 
 
 ## como funciona
+
 ###la idea central es que la animación es una función pura del tiempo :3
+
 no hay estado que se va mutando frame a frame. hay una variable global `T` (segundos desde `t0`) y cada elemento calcula su progreso con una sola función
 cada flor deriva tres valores de `T` en `budState()`:
 

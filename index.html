@@ -3,11 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ASCII Lilies</title>
+<title>Valen GS :3</title>
 <style>
   html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
   canvas { display: block; width: 100vw; height: 100vh; height: 100dvh; cursor: pointer; }
-
+  #credit {
+    position: fixed; left: 0; right: 0;
+    top: calc(12px + env(safe-area-inset-top));
+    margin: 0;
+    text-align: center;
+    font: 11px/1 Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    letter-spacing: 0.04em;
+    color: rgba(255, 198, 218, 0.6);
+    pointer-events: none;
+    user-select: none;
+  }
+  #credit span { color: #ff86b0; }
   /* butones por si celu */
   #controls {
     position: fixed; left: 0; right: 0;
@@ -43,6 +54,7 @@
 </head>
 <body>
 <canvas id="screen"></canvas>
+<p id="credit">made by Valen G. Spilere <span>♡</span></p>
 <nav id="controls" aria-label="Bouquet options">
   <button type="button" data-action="flowers"></button>
   <button type="button" data-action="visitor"></button>

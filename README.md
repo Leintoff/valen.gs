@@ -28,7 +28,7 @@ cada flor deriva tres valores de `T` en `budState()`:
 
 | valor | para que sirve |
 | :--- | :--- |
-| `grow` | tamaño del capullo |
+| `grow` | tamaño-estado de flor |
 | `blush` | color: verde a rosado |
 | `open` | apertura de los tépalos |
 

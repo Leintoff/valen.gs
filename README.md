@@ -18,12 +18,23 @@ Se puede insertar &to=<user>&from=<user> y &msg= para un tag personalizado c:
 | <kbd>V</kbd> | alterna entre abeja y mariquita |
 | <kbd>B</kbd> | saca el ribbon |
 | <kbd>C</kbd> | cambia el color |
+| <kbd>H</kbd> | esconde o muestra los botones |
 
+
+## como funciona
 la idea central es que la animación es una función pura del tiempo :3
-cada flor tiene 3 valores derivados de T en budState(): grow, blush y open. cada flor son 6 piezas que son la misma forma con bezierCurveTo, rotados k*60*open grados, entonces abrir la flor es literalmente rotarlos hacia afuera. el color pasa de verde a rosado a color final con mix(), que interpola en RGB.
+no hay estado que se va mutando frame a frame. hay una variable global `T` (segundos desde `t0`) y cada elemento calcula su progreso con una sola función
+cada flor deriva tres valores de `T` en `budState()`:
+
+| valor | para que sirve |
+| :--- | :--- |
+| `grow` | tamaño del capullo |
+| `blush` | color: verde a rosado |
+| `open` | apertura de los tépalos |
+una flor son **6 piezas con la misma forma** (`bezierCurveTo`), rotados `k * 60° * open`. abrir la flor es, literalmente, rotarlos hacia afuera. el color se interpola en RGB con `mix()`: verde, rosa polvo y color final.
+
+
 
 <br>
 
-<p align="center">
-  <sub>una flor a la vez</sub>
-</p>
+<br> <p align="center"> hecho por <a href="https://github.com/Leintoff">Valen G. Spilere</a> ♡ </p>

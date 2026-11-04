@@ -2,15 +2,54 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Valen GS :3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ASCII Lilies</title>
 <style>
   html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
-  canvas { display: block; width: 100vw; height: 100vh; cursor: pointer; }
+  canvas { display: block; width: 100vw; height: 100vh; height: 100dvh; cursor: pointer; }
+
+  /* small pill buttons along the bottom, in the same monospace as the art */
+  #controls {
+    position: fixed; left: 0; right: 0;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    padding: 0 10px;
+    pointer-events: none;
+  }
+  #controls[hidden] { display: none; }
+  #controls button {
+    pointer-events: auto;
+    font: 12px/1 Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    color: #ffc6da;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 198, 218, 0.28);
+    border-radius: 999px;
+    min-height: 34px;
+    padding: 0 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  #controls button[hidden] { display: none; }
+  #controls button:hover, #controls button:focus-visible { border-color: rgba(255, 198, 218, 0.7); outline: none; }
+  #controls button:active { background: rgba(255, 134, 176, 0.18); }
+  #controls .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  @media (pointer: coarse) {
+    #controls button { min-height: 40px; font-size: 13px; }
+  }
 </style>
 </head>
 <body>
 <canvas id="screen"></canvas>
+<nav id="controls" aria-label="Bouquet options">
+  <button type="button" data-action="flowers"></button>
+  <button type="button" data-action="visitor"></button>
+  <button type="button" data-action="wings" aria-label="butterfly wing colour"></button>
+  <button type="button" data-action="ribbon"></button>
+  <button type="button" data-action="replay" aria-label="replay the bloom"></button>
+</nav>
 <script src="bouquet.js"></script>
 </body>
 </html>

@@ -978,10 +978,10 @@
   const swatch = (c) => `<i class="dot" style="background:${c}"></i>`;
   function updateButtons() {
     const label = {
-      flowers: `flowers · ${PALETTE_NAMES[palette]}`,
-      visitor: `visitor · ${settings.visitor}`,
+      flowers: `flores · ${PALETTE_NAMES[palette]}`,
+      visitor: `bichito · ${settings.visitor}`,
       wings: `${swatch(wingColors(settings.wing)[1])}wings`,
-      ribbon: `ribbon · ${settings.ribbon ? 'on' : 'off'}`,
+      ribbon: `cinta? · ${settings.ribbon ? 'on' : 'off'}`,
       replay: '↻',
     };
     for (const btn of controls.querySelectorAll('button')) {

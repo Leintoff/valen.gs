@@ -829,6 +829,8 @@
   const octx = off.getContext('2d', { willReadFrequently: true });
 
   let cols = 0, rows = 0, cellW = 0, cellH = 0, fontSize = 0, dpr = 1;
+  let reservePx = 0; // screen space kept clear at the bottom for the buttons
+  let avail = 0; // rows above the buttons that the bouquet is fitted into
   const styleCache = new Map();
   function style(r, g, b) {
     const key = (r << 16) | (g << 8) | b;
@@ -857,20 +859,23 @@
   function render(S, pal) {
     // paint the scene into the low-res buffer, correcting for tall character cells
     const aspect = cellH / cellW;
-    const sx = Math.min(cols / WORLD_W, (rows * aspect) / WORLD_H) * 0.96;
+    avail = Math.max(10, rows - Math.ceil(reservePx / cellH));
+    const sx = Math.min(cols / WORLD_W, (avail * aspect) / WORLD_H) * 0.96;
     octx.setTransform(1, 0, 0, 1, 0, 0);
     octx.fillStyle = '#000';
     octx.fillRect(0, 0, cols, rows);
-    const ox = (cols - WORLD_W * sx) / 2, oy = (rows - (WORLD_H * sx) / aspect) / 2;
+    const ox = (cols - WORLD_W * sx) / 2, oy = (avail - (WORLD_H * sx) / aspect) / 2;
     octx.setTransform(sx, 0, 0, sx / aspect, ox, oy);
 
     // place the tag below and to the right of the bow, kept on screen
     let tagCol = 0, tagRow = 0;
     if (TAG) {
-      const tw = Math.max(...TAG.map((r) => r.length));
+      // on small screens the tag gets bigger letters than the art, so it stays readable
+      const k = textScale();
+      const tw = Math.max(...TAG.map((r) => r.length)) * k;
       tagCol = clamp(Math.round(612 * sx + ox), 0, Math.max(0, cols - tw));
-      tagRow = clamp(Math.round(((BOW_Y + 25) * sx) / aspect + oy), 0, Math.max(0, rows - TAG.length));
-      tagHole = [(tagCol + 2.5 - ox) / sx, ((tagRow + 1.5 - oy) * aspect) / sx];
+      tagRow = clamp(Math.round(((BOW_Y + 25) * sx) / aspect + oy), 0, Math.max(0, avail - TAG.length * k));
+      tagHole = [(tagCol + 2.5 * k - ox) / sx, ((tagRow + 1.5 * k - oy) * aspect) / sx];
     }
 
     drawScene(octx, S, pal);
@@ -912,17 +917,26 @@
   // a small label in the corner confirming what a key just changed
   let toast = null;
   function showToast(text) { toast = { text, at: performance.now() }; }
+  // readable text needs at least 11px letters, even when the art's grid is finer
+  const MIN_TEXT_PX = 11;
+  const textScale = () => Math.max(1, MIN_TEXT_PX / fontSize);
+  function useTextFont() {
+    sctx.font = `bold ${Math.round(fontSize * textScale())}px Menlo, Consolas, "DejaVu Sans Mono", monospace`;
+  }
+
   function drawToast() {
     if (!toast) return;
     const age = (performance.now() - toast.at) / 1000;
     if (age > 2.2) { toast = null; return; }
     sctx.save();
     sctx.globalAlpha = 1 - smooth(1.6, 2.2, age);
-    const x = 2 * cellW, y = (rows - 3) * cellH;
+    useTextFont();
+    const k = textScale(), cw = cellW * k, ch = cellH * k;
+    const x = cw * 1.5, y = avail * cellH - ch * 1.5;
     sctx.fillStyle = '#000';
-    sctx.fillRect(x - cellW, y, (Array.from(toast.text).length + 2) * cellW, cellH);
+    sctx.fillRect(x - cw, y, (Array.from(toast.text).length + 2) * cw, ch);
     sctx.fillStyle = RIBBON.light;
-    Array.from(toast.text).forEach((ch, i) => sctx.fillText(ch, x + i * cellW, y));
+    Array.from(toast.text).forEach((c, i) => sctx.fillText(c, x + i * cw, y));
     sctx.restore();
   }
 
@@ -933,19 +947,23 @@
     if (!shown) return;
     const typed = Math.max(0, (T - TAG_START - 0.8) * TYPE_SPEED);
     const drop = Math.round((1 - easeOut(shown)) * -2);
+    const k = textScale(), cw = cellW * k, chH = cellH * k;
+    sctx.save();
+    useTextFont();
     TAG.forEach((cells, r) => {
-      const y = (row + r + drop) * cellH;
+      const y = row * cellH + (r + drop) * chH;
       // black out the flowers behind the card
       const first = cells.findIndex(([, kind]) => kind);
       sctx.fillStyle = '#000';
-      sctx.fillRect((col + first) * cellW, y, (cells.length - first) * cellW, cellH);
+      sctx.fillRect(col * cellW + first * cw, y, (cells.length - first) * cw, chH);
       cells.forEach(([ch, kind, order], c) => {
         if (!kind || kind === 'blank') return;
         if (order !== undefined && order >= typed) return;
         sctx.fillStyle = kind === 'text' ? '#fbf1e2' : kind === 'heart' ? RIBBON.main : kind === 'hole' ? '#8a7f74' : RIBBON.light;
-        sctx.fillText(ch, (col + c) * cellW, y);
+        sctx.fillText(ch, col * cellW + c * cw, y);
       });
     });
+    sctx.restore();
   }
 
   // ---------- loop ----------
@@ -963,29 +981,74 @@
   }
 
   const replay = () => { t0 = performance.now(); };
+  const next = (list, cur) => list[(list.indexOf(cur) + 1) % list.length];
+  const PALETTE_NAMES = ['pink', 'white', 'mixed'];
+
+  // every option change goes through here, from a key or a button
+  const actions = {
+    replay,
+    flowers() { palette = (palette + 1) % PALETTES.length; replay(); return `flowers: ${PALETTE_NAMES[palette]}`; },
+    visitor() {
+      settings.visitor = next(VISITOR_NAMES, settings.visitor);
+      return `visitor: ${settings.visitor}${T < BF_START && settings.visitor !== 'none' ? ' (arrives at ~11s)' : ''}`;
+    },
+    wings() {
+      settings.wing = next(WING_NAMES, WING_NAMES.includes(settings.wing) ? settings.wing : 'white');
+      settings.visitor = 'butterfly'; // wing colours are for the butterfly
+      return `butterfly wings: ${settings.wing}`;
+    },
+    ribbon() { settings.ribbon = !settings.ribbon; return `ribbon: ${settings.ribbon ? 'on' : 'off'}`; },
+  };
+  function act(name, fromKey) {
+    const msg = actions[name]();
+    if (name === 'replay') return;
+    // the buttons already show the new value, so only keys need the corner label
+    // (and the "arrives soon" hint is worth showing either way)
+    if (fromKey || /arrives/.test(msg)) showToast(msg);
+    syncUrl();
+    updateButtons();
+  }
+
   window.addEventListener('resize', resize);
   screen.addEventListener('click', replay);
+  const KEYS = { ' ': 'replay', r: 'replay', p: 'flowers', c: 'flowers', v: 'visitor', w: 'wings', b: 'ribbon' };
   window.addEventListener('keydown', (e) => {
-    if (e.key === ' ' || e.key === 'r') replay();
-    if (e.key === 'p' || e.key === 'c') { palette = (palette + 1) % PALETTES.length; replay(); syncUrl(); }
-    const next = (list, cur) => list[(list.indexOf(cur) + 1) % list.length];
-    if (e.key === 'v') {
-      settings.visitor = next(VISITOR_NAMES, settings.visitor);
-      showToast(`visitor: ${settings.visitor}${T < BF_START ? ' (arrives at ~11s)' : ''}`);
-      syncUrl();
-    }
-    if (e.key === 'w') {
-      settings.wing = next(WING_NAMES, settings.wing);
-      settings.visitor = 'butterfly'; // wing colours are for the butterfly
-      showToast(`butterfly wings: ${settings.wing}`);
-      syncUrl();
-    }
-    if (e.key === 'b') {
-      settings.ribbon = !settings.ribbon;
-      showToast(`ribbon: ${settings.ribbon ? 'on' : 'off'}`);
-      syncUrl();
-    }
+    if (e.key === 'h') return toggleButtons();
+    const name = KEYS[e.key];
+    if (name) { e.preventDefault(); act(name, true); }
   });
+
+  // ---------- buttons, for phones and anyone without a keyboard ----------
+  const controls = document.getElementById('controls');
+  const swatch = (c) => `<i class="dot" style="background:${c}"></i>`;
+  function updateButtons() {
+    const label = {
+      flowers: `flowers · ${PALETTE_NAMES[palette]}`,
+      visitor: `visitor · ${settings.visitor}`,
+      wings: `${swatch(wingColors(settings.wing)[1])}wings`,
+      ribbon: `ribbon · ${settings.ribbon ? 'on' : 'off'}`,
+      replay: '↻',
+    };
+    for (const btn of controls.querySelectorAll('button')) {
+      const name = btn.dataset.action;
+      if (label[name]) btn.innerHTML = label[name];
+      if (name === 'wings') btn.hidden = settings.visitor !== 'butterfly';
+    }
+  }
+  controls.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (btn) act(btn.dataset.action, false);
+  });
+  // keep the bouquet clear of the buttons, however many lines they wrap onto
+  function measureButtons() {
+    reservePx = controls.hidden ? 0 : controls.getBoundingClientRect().height + 12;
+  }
+  new ResizeObserver(measureButtons).observe(controls);
+  function toggleButtons() {
+    controls.hidden = !controls.hidden;
+    measureButtons();
+    syncUrl();
+  }
 
   // keep the address bar in step with the choices, so the link can be shared as is
   function syncUrl() {
@@ -995,6 +1058,7 @@
     settings.visitor === 'butterfly' ? q.delete('bug') : q.set('bug', settings.visitor);
     settings.wing === 'blue' ? q.delete('wing') : q.set('wing', settings.wing.replace('#', ''));
     settings.ribbon ? q.delete('ribbon') : q.set('ribbon', 'off');
+    controls.hidden ? q.set('ui', 'off') : q.delete('ui');
     try { history.replaceState(null, '', '?' + q.toString()); } catch (err) { /* some browsers block this on file:// */ }
   }
 
@@ -1002,6 +1066,10 @@
   if (params.has('p')) palette = clamp(+params.get('p') | 0, 0, PALETTES.length - 1);
   if (params.has('t')) t0 = performance.now() - +params.get('t') * 1000;
 
+  // ?ui=off hides the buttons, for a clean link to send someone
+  controls.hidden = /^(0|off|no|false)$/i.test(params.get('ui') || '');
+  updateButtons();
+  measureButtons();
   resize();
   requestAnimationFrame(frame);
 })();

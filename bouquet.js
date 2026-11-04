@@ -1,10 +1,4 @@
-// ASCII lilies: the scene is painted with vector shapes onto a tiny offscreen
-// canvas (one pixel per character cell), then every pixel is redrawn as a
-// coloured ASCII glyph whose density follows the pixel's brightness.
-//
-// The bloom follows how cut lilies actually open: a bunch of tall leafy stems,
-// each ending in a cluster of long green buds. Buds swell and blush, then split
-// into six tepals that curl back to show the stamens. Some buds stay green.
+// VVS
 (() => {
   'use strict';
 
@@ -14,15 +8,15 @@
   const FPS = 30;
 
   const PALETTES = [
-    { // pink lilies, like the photos
+    { // paletas rosa
       petal: '#f39ab2', edge: '#f9c3d2', blush: '#d99aa6', throat: '#c9dc78', vein: 'rgba(170,40,80,0.45)',
       anther: '#4a1d10', spots: true,
     },
-    { // white oriental lilies
+    { // paletas blanca
       petal: '#f6f2ea', edge: '#ffffff', blush: '#d8dcc0', throat: '#c8d87a', vein: 'rgba(120,130,90,0.4)',
       anther: '#8a3a16', spots: false,
     },
-    { // mixed garden, like the ASCII video
+    { // mix
       petal: ['#e3233a', '#d24aa9', '#f08a2a', '#e9c63c', '#f1e4c6', '#f39ab2'], edge: null,
       blush: '#c98a7a', throat: '#e8d070', vein: 'rgba(80,10,20,0.45)', anther: '#3a160a', spots: true,
     },
@@ -41,7 +35,7 @@
   const lerp = (a, b, t) => a + (b - a) * t;
   const prog = (T, start, dur) => clamp((T - start) / dur, 0, 1);
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
-  // overshoots a little past 1 and settles back, for a springy "pop"
+  // "pop"
   const easeOutBack = (t, k = 1.70158) => 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2);
   const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const smooth = (a, b, t) => { const x = clamp((t - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
@@ -71,7 +65,6 @@
     return Math.atan2(b[1] - a[1], b[0] - a[0]);
   }
 
-  // Gentle breeze: higher points drift further, so the whole bunch bends together.
   let T = 0;
   function sway(x, y) {
     const lift = clamp((1090 - y) / 800, 0, 1);
@@ -79,7 +72,6 @@
   }
 
   // ---------- scene ----------
-  // Timeline (seconds): stems rise, leaves unfurl, buds swell and blush, then open one by one.
   const STEM_START = 0, STEM_DUR = 2.6;
   const LEAF_START = 1.0;
   const BUD_START = 2.2;
@@ -102,7 +94,7 @@
       const stemRef = { pts: stem, start: STEM_START + r() * 0.4 };
       S.stems.push(stemRef);
 
-      // lance-shaped leaves spiral up the middle of each stem
+      // medio de las stems
       const n = 5 + Math.floor(r() * 3);
       for (let i = 0; i < n; i++) {
         const t = 0.22 + (i / n) * 0.5 + r() * 0.04;
@@ -113,7 +105,7 @@
         });
       }
 
-      // buds: one at the tip, the rest on short pedicels branching just below it
+      // buds
       S.buds.push({ stem, stemRef, at: 1, ped: null, dir: rad(-90 + lean + (r() - 0.5) * 10) });
       for (let k = 0; k < sides; k++) {
         const side = k % 2 ? 1 : -1;
@@ -127,7 +119,7 @@
       }
     }
 
-    // decide each bud's fate: about half open fully, a few only blush, the rest stay green
+    // matematica buds
     const order = S.buds.map((_, i) => i).sort(() => r() - 0.5);
     order.forEach((idx, rank) => {
       const b = S.buds[idx];
@@ -151,7 +143,7 @@
     return S;
   }
 
-  // Ruscus and baby's breath fill out the bunch around the lilies.
+  // quien sos y por que estas leyendo el codigo
   const RUSCUS_START = 0.6;
   const GYP_START = 2.4;
 
@@ -160,7 +152,7 @@
     S.ruscus = [];
     S.gyp = [];
 
-    // ruscus: long arching sprigs with glossy leaves alternating up the stem
+    // ruscus
     const sprig = (base, ang, len, start, depth) => {
       const end = [base[0] + Math.cos(ang) * len, base[1] + Math.sin(ang) * len];
       const bend = (r() - 0.5) * len * 0.3;
@@ -181,15 +173,14 @@
         }
       }
     };
-    // a few sprigs tucked behind the lilies, ending just inside the bouquet's outline
+  
     for (const end of [[210, 560], [270, 340], [420, 215], [600, 205], [750, 320], [810, 560]]) {
       const base = [490 + r() * 20, 820 - r() * 40];
       const ang = Math.atan2(end[1] - base[1], end[0] - base[0]);
       sprig(base, ang, Math.hypot(end[0] - base[0], end[1] - base[1]), RUSCUS_START + r() * 0.8, 0);
     }
 
-    // baby's breath: thin stems that fork again and again into clouds of tiny white flowers
-    // small sprays tucked between the lilies, as in a florist's bouquet
+
     const clouds = [
       [340, 460], [660, 430], [500, 330], [280, 610], [740, 610],
       [450, 610], [590, 640], [400, 340], [620, 340], [520, 520],
@@ -211,7 +202,6 @@
         const kids = 2 + (r() < 0.45 ? 1 : 0);
         for (let k = 0; k < kids; k++) {
           const spread = rad(lerp(-70, 70, kids === 1 ? 0.5 : k / (kids - 1)) + (r() - 0.5) * 30);
-          // children lean back toward upward/outward so the cloud stays rounded
           const target = lerp(ang + spread, outward, 0.25);
           branch(x2, y2, target, len * (0.4 + r() * 0.45), depth - 1, t2);
         }
@@ -252,7 +242,6 @@
     g.save();
     g.translate(x, y);
     g.rotate(ang);
-    // the tip arches away from the stem
     const bend = lf.side * L * 0.18;
     g.beginPath();
     g.moveTo(0, 0);
@@ -273,8 +262,7 @@
     g.restore();
   }
 
-  // One tepal along +x. Closed, six of these overlap into the club-shaped bud;
-  // open, they fan out and their tips curl back.
+
   function tepal(g, L, W, color, edge, throat, vein, open, curl, spots, rnd) {
     const rc = smooth(0.45, 1, open);
     const tipX = L * (1 - 0.12 * rc), tipY = curl * W * 1.6 * rc;
@@ -308,7 +296,6 @@
   function budState(b) {
     const grow = easeOut(prog(T, b.grow, 2.2));
     const blush = smooth(0, 1, prog(T, BLUSH_START + (b.grow - BUD_START), 2.5)) * b.blush;
-    // slow to split, then the tepals spring open past flat and settle back
     const p = prog(T, b.openAt, OPEN_DUR);
     const open = easeOutBack(p * p, 1.6) * b.maxOpen;
     return { grow, blush, open };
@@ -346,11 +333,9 @@
     g.translate(x, y);
     g.rotate(b.dir + b.droop * open);
     g.scale(1, lerp(1, b.squash, open));
-    // short green receptacle where the bud meets the pedicel
     g.fillStyle = '#5f9a34';
     g.beginPath(); g.ellipse(0, 0, 9, 7, 0, 0, Math.PI * 2); g.fill();
     g.rotate(b.twist * open);
-    // back three tepals first, then the front three
     for (const k of [3, 1, -1, 2, -2, 0]) {
       g.save();
       g.rotate(rad(k * 60) * open);
@@ -358,7 +343,6 @@
       tepal(g, L * wob, W, color, edgeCol, throat, pal.vein, open, k === 0 ? 0.3 : Math.sign(k) || 1, pal.spots, b.rnd);
       g.restore();
     }
-    // stamens and pistil reach out once the tepals have parted
     const st = smooth(0.55, 1, open);
     if (st > 0) {
       for (let i = 0; i < 6; i++) {
@@ -453,11 +437,11 @@
   const WING_NAMES = ['blue', 'lilac', 'yellow', 'orange', 'mint', 'white'];
 
   // ---------- gift wrapping ----------
-  // A satin bow ties the gathered stems; an optional tag (?to=&from=&msg=) hangs off it.
+  // el mensaje se pone con (?to=&from=&msg=) en la url y queda al costado del bow.
   const BOW_START = 2.8, BOW_Y = 960;
-  const TAG_START = 3.8, TYPE_SPEED = 16; // characters per second
+  const TAG_START = 3.8, TYPE_SPEED = 16; // caracteres por segundo
   const RIBBON = { main: '#ff86b0', dark: '#b8406e', light: '#ffc6da' };
-  let tagHole = null; // world position of the tag's string hole, set by the renderer
+  let tagHole = null; // posicion de tag
 
   function drawBow(g) {
     const p = prog(T, BOW_START, 0.9);
@@ -465,7 +449,6 @@
     const [x, y] = sway(500, BOW_Y);
     g.save();
     g.translate(x, y);
-    // the band wraps around the stems first, then the bow pops out of it
     const bw = 44 * easeOut(Math.min(1, p * 2.5));
     g.fillStyle = RIBBON.dark;
     g.beginPath(); g.roundRect(-bw, -11, bw * 2, 22, 8); g.fill();
@@ -474,7 +457,6 @@
     g.scale(s, s);
     g.strokeStyle = 'rgba(0,0,0,0.6)';
     g.lineWidth = 5;
-    // tails with a V-notch at the ends, swinging gently
     for (const side of [-1, 1]) {
       g.save();
       g.rotate(Math.sin(T * 1.7 + side) * 0.05);
@@ -485,7 +467,6 @@
       g.fillStyle = RIBBON.main; g.fill(); g.stroke();
       g.restore();
     }
-    // loops, bobbing a little out of step with each other
     for (const side of [-1, 1]) {
       g.save();
       g.rotate(Math.sin(T * 2.1 + side * 1.3) * 0.06);
@@ -498,7 +479,6 @@
       grad.addColorStop(0.45, RIBBON.main);
       grad.addColorStop(1, RIBBON.light);
       g.fillStyle = grad; g.fill(); g.stroke();
-      // shadowy inside of the loop
       g.beginPath();
       g.moveTo(side * 14, -4);
       g.bezierCurveTo(side * 30, -36, side * 70, -32, side * 66, -9);
@@ -514,7 +494,7 @@
     g.restore();
   }
 
-  // the string from the knot down to the tag, unspooling as it goes
+  // añadir comentarios
   function drawTagString(g) {
     if (!tagHole) return;
     const p = easeOut(prog(T, TAG_START, 0.5));
@@ -534,7 +514,7 @@
     g.stroke();
   }
 
-  // Tag text comes from the URL, e.g. ?to=Mia&from=Sam&msg=happy%20birthday
+  // ?to=M&from=Valen&msg=happy%20birthday
   const params = new URLSearchParams(location.search);
   const settings = {
     visitor: VISITOR_NAMES.includes(params.get('bug')) ? params.get('bug') : 'butterfly',
@@ -551,12 +531,7 @@
   if (TAG_LINES.length === 1) TAG_LINES.push('');
   if (params.get('to')) document.title = `for ${cut(params.get('to'))} ♡`;
 
-  // Lay the tag out as rows of characters, like a luggage tag:
-  //   .------------.
-  //  /o  for Mia ♡  |
-  //  \  love, Sam   |
-  //   '------------'
-  // Each cell is [char, kind]; text cells also carry their typing order.
+
   function tagRows() {
     const w = Math.max(...TAG_LINES.map((l) => Array.from(l).length)) + 4;
     const frame = (str) => Array.from(str).map((ch) => [ch, ch === ' ' ? null : 'frame']);
@@ -579,13 +554,10 @@
   }
   const TAG = TAG_LINES.length ? tagRows() : null;
 
-  // ---------- visitor: butterfly, bee or ladybug ----------
-  // Once most lilies are open, a little visitor drifts in, visits three of them
-  // (folding its wings slowly while it sits), flutters off, and comes back later.
+  // ---------- butterfly, bee or ladybug ----------
   const BF_START = 10.5, BF_FLY = 3, BF_SIT = 3.5, BF_REST = 6;
   const BF_PERIOD = 4 * BF_FLY + 3 * BF_SIT + BF_REST;
 
-  // the middle of an open lily's face, following its sway and droop
   function landingSpot(b) {
     const { open } = budState(b);
     const base = b.ped ? b.ped[3] : bez(b.stem, 1);
@@ -601,7 +573,6 @@
     const cycle = Math.floor(t / BF_PERIOD);
     let local = t - cycle * BF_PERIOD;
 
-    // pick three different open lilies for this visit, and alternate the side it comes from
     const r = rng(100 + cycle);
     const opened = S.buds.filter((b) => b.maxOpen === 1);
     const stops = opened.map((b) => [r(), b]).sort((a, b) => a[0] - b[0]).slice(0, 3).map(([, b]) => landingSpot(b));
@@ -612,7 +583,6 @@
       if (local < BF_FLY) {
         const u = local / BF_FLY, e = easeInOut(u);
         const [a, b] = [pts[leg], pts[leg + 1]];
-        // a looping, bobbing flight path rather than a straight line
         const x = lerp(a[0], b[0], e) + Math.sin(u * Math.PI * 2) * 30;
         const y = lerp(a[1], b[1], e) - Math.sin(u * Math.PI) * 90 + Math.sin(T * 7) * 6;
         const face = Math.sign(b[0] - a[0]) || 1;
@@ -623,7 +593,6 @@
       if (leg === 3) return null; // resting off screen
       if (local < BF_SIT) {
         const [x, y] = pts[leg + 1];
-        // settle in, then slowly open and close
         const settle = smooth(0, 0.4, local);
         const wings = lerp(0.6, 0.55 + 0.45 * Math.cos(local * 2.2), settle);
         const face = Math.sign(pts[leg + 1][0] - pts[leg][0]) || 1;
@@ -671,7 +640,6 @@
     g.scale(1.7, 1.7);
     g.strokeStyle = OUTLINE;
     g.lineWidth = 6;
-    // wings seen from the front: flapping squeezes them towards the body
     for (const s of [-1, 1]) {
       g.save();
       g.scale(v.wings, 1);
@@ -711,19 +679,15 @@
     }
   }
 
-  // Bee and ladybug are drawn at roughly real-bug size next to a lily: chubby, round
-  // and high-contrast, with thin outlines, so they still read at a few characters across.
+  // importante
   const BUG_SCALE = 1.7;
 
-  // A round fuzzy bumblebee seen from the side, facing the way it flies.
   function drawBee(g, v) {
-    // bees buzz: a quick jitter in the air, a little wiggle while they sit
     if (v.flying) g.translate(Math.sin(T * 23) * 3, Math.sin(T * 31) * 2.5);
     else g.translate(Math.sin(T * 9) * 1, 4);
     g.scale(v.face * BUG_SCALE, BUG_SCALE);
     g.strokeStyle = OUTLINE;
     g.lineWidth = 2.5;
-    // see-through wings behind the body: a blur of beats in flight, folded back at rest
     const beat = v.flying ? 0.35 + 0.65 * Math.abs(Math.sin(T * 40)) : 0.9;
     for (const k of [0, 1]) {
       g.save();
@@ -734,7 +698,7 @@
       g.fillStyle = 'rgba(232,248,255,0.95)'; g.fill();
       g.restore();
     }
-    // chubby striped body
+    // chubby 
     g.beginPath(); g.ellipse(-4, 0, 24, 20, 0, 0, Math.PI * 2);
     const grad = g.createRadialGradient(-8, -8, 2, -4, 0, 26);
     grad.addColorStop(0, '#fff6b0');
@@ -750,7 +714,7 @@
     // tiny stinger
     g.fillStyle = '#5a3a1a';
     g.beginPath(); g.moveTo(-27, -3); g.lineTo(-35, 1); g.lineTo(-27, 4); g.fill();
-    // big round head with a shiny eye and a rosy cheek
+    // big round head 
     g.fillStyle = '#a8743c';
     g.beginPath(); g.arc(22, -3, 13, 0, Math.PI * 2); g.fill(); g.stroke();
     g.fillStyle = '#ffffff';
@@ -762,9 +726,7 @@
     g.beginPath(); g.moveTo(25, -15); g.quadraticCurveTo(30, -26, 37, -25); g.stroke();
   }
 
-  // A shiny round ladybug: shell closed while it sits, lifted with wings buzzing in flight.
   function drawLadybug(g, v) {
-    // it potters about on the petal a little while it sits
     if (!v.flying) g.translate(Math.sin(v.local * 1.3) * 5, 6);
     g.scale(v.face * BUG_SCALE, BUG_SCALE);
     g.strokeStyle = OUTLINE;
@@ -813,7 +775,6 @@
     drawGyp(g, S, false);
     for (const st of S.stems) strokeCurve(g, st.pts, 0, stemProgress(st), 9, '#5a9a30');
     for (const lf of S.leaves) drawLeaf(g, lf);
-    // closed buds behind, then open flowers in the order they opened
     const sorted = S.buds.slice().sort((a, b) => budState(a).open - budState(b).open || (a.openAt - b.openAt || 0));
     for (const b of sorted) drawBud(g, b, pal);
     drawGyp(g, S, true);
@@ -857,7 +818,6 @@
   }
 
   function render(S, pal) {
-    // paint the scene into the low-res buffer, correcting for tall character cells
     const aspect = cellH / cellW;
     avail = Math.max(10, rows - Math.ceil(reservePx / cellH));
     const sx = Math.min(cols / WORLD_W, (avail * aspect) / WORLD_H) * 0.96;
@@ -870,7 +830,6 @@
     // place the tag below and to the right of the bow, kept on screen
     let tagCol = 0, tagRow = 0;
     if (TAG) {
-      // on small screens the tag gets bigger letters than the art, so it stays readable
       const k = textScale();
       const tw = Math.max(...TAG.map((r) => r.length)) * k;
       tagCol = clamp(Math.round(612 * sx + ox), 0, Math.max(0, cols - tw));
@@ -940,8 +899,7 @@
     sctx.restore();
   }
 
-  // The tag is drawn as real characters so the message stays readable:
-  // the card drops in once the string reaches it, then the words type themselves out.
+
   function drawTag(col, row) {
     const shown = prog(T, TAG_START + 0.45, 0.35);
     if (!shown) return;
@@ -952,7 +910,6 @@
     useTextFont();
     TAG.forEach((cells, r) => {
       const y = row * cellH + (r + drop) * chH;
-      // black out the flowers behind the card
       const first = cells.findIndex(([, kind]) => kind);
       sctx.fillStyle = '#000';
       sctx.fillRect(col * cellW + first * cw, y, (cells.length - first) * cw, chH);
@@ -984,7 +941,6 @@
   const next = (list, cur) => list[(list.indexOf(cur) + 1) % list.length];
   const PALETTE_NAMES = ['pink', 'white', 'mixed'];
 
-  // every option change goes through here, from a key or a button
   const actions = {
     replay,
     flowers() { palette = (palette + 1) % PALETTES.length; replay(); return `flowers: ${PALETTE_NAMES[palette]}`; },
@@ -1002,8 +958,7 @@
   function act(name, fromKey) {
     const msg = actions[name]();
     if (name === 'replay') return;
-    // the buttons already show the new value, so only keys need the corner label
-    // (and the "arrives soon" hint is worth showing either way)
+
     if (fromKey || /arrives/.test(msg)) showToast(msg);
     syncUrl();
     updateButtons();
@@ -1018,7 +973,7 @@
     if (name) { e.preventDefault(); act(name, true); }
   });
 
-  // ---------- buttons, for phones and anyone without a keyboard ----------
+  // ---------- buttons, para celu o sin teclado----------
   const controls = document.getElementById('controls');
   const swatch = (c) => `<i class="dot" style="background:${c}"></i>`;
   function updateButtons() {
@@ -1039,7 +994,6 @@
     const btn = e.target.closest('button');
     if (btn) act(btn.dataset.action, false);
   });
-  // keep the bouquet clear of the buttons, however many lines they wrap onto
   function measureButtons() {
     reservePx = controls.hidden ? 0 : controls.getBoundingClientRect().height + 12;
   }
@@ -1050,7 +1004,6 @@
     syncUrl();
   }
 
-  // keep the address bar in step with the choices, so the link can be shared as is
   function syncUrl() {
     const q = new URLSearchParams(location.search);
     q.delete('t');

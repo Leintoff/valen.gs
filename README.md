@@ -11,7 +11,7 @@
 
 ## Controles
 
-Se puede insertar &to=<user>&from=<user> para un tag personalizado c: 
+Se puede insertar &to=<user>&from=<user> y &msg= para un tag personalizado c: 
 | Tecla | Qué hace |
 | :---: | :--- |
 | <kbd>W</kbd> | cambia el color de la mariposa |

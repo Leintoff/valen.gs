@@ -22,7 +22,7 @@ Se puede insertar &to=<user>&from=<user> y &msg= para un tag personalizado c:
 
 
 ## como funciona
-la idea central es que la animación es una función pura del tiempo :3
+###la idea central es que la animación es una función pura del tiempo :3
 no hay estado que se va mutando frame a frame. hay una variable global `T` (segundos desde `t0`) y cada elemento calcula su progreso con una sola función
 cada flor deriva tres valores de `T` en `budState()`:
 
@@ -35,7 +35,35 @@ cada flor deriva tres valores de `T` en `budState()`:
 
 una flor son **6 piezas con la misma forma** (`bezierCurveTo`), rotados `k * 60° * open`. abrir la flor es, literalmente, rotarlos hacia afuera. el color se interpola en RGB con `mix()`: verde, rosa polvo y color final.
 
+### el renderer ascii
+```
+ canvas offscreen          getImageData            canvas visible
+ (cols x rows px)    ->    brillo por pixel   ->   fillText(RAMP[i])
+ 1 pixel = 1 celda         max(r, g, b)            + glow con blur
+```
+' .:-=+*cxoaX#%&@'`: de poca luz (`.`) a mucha (`@`)
 
+## parametros de la url
+
+ 
+| param | valores | default | que hace |
+| :--- | :--- | :---: | :--- |
+| `to` | texto (max 22) | | destinatario de la tarjeta |
+| `msg` | texto (max 22) | | mensaje de la tarjeta |
+| `from` | texto (max 22) | | firma de la tarjeta |
+| `bug` | `butterfly` `bee` `ladybug` `none` | `butterfly` | bichito visitante |
+| `wing` | nombre o hex de 6 dígitos | `blue` | color de alas |
+| `ribbon` | `off` `0` `no` `false` | on | oculta el moño |
+| `p` | `0` `1` `2` | `0` | paleta: rosa, blanca, mixta |
+| `t` | segundos | `0` | arranca adentro de la animación |
+| `ui` | `off` `0` `no` `false` | on | oculta los botones |
+ 
+ejemplo para mandar con mensaje:
+ 
+```
+index.html?to=Mati&msg=feliz%20cumple&from=Valen&ui=off
+```
+ 
 
 <br>
 

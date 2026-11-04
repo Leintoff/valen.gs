@@ -5,8 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=F4A6C0&center=true&vCenter=true&width=600&lines=mariposas+abejas+y+mariquitas;presiona+una+tecla+y+mira+qué+pasa" alt="Typing animation" />
-</p>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=F4A6C0&center=true&vCenter=true&width=600&lines=mariposas+abejas+y+mariquitas;presiona+una+tecla+y+mira+qu%C3%A9+pasa" alt="Typing animation" /></p>
 
 <br>
 

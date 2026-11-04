@@ -1,4 +1,4 @@
-<h1 align="center">Flowers</h1>
+<h1 align="center">Valen GS.</h1>
 
 <p align="center">
   <i>hmph!</i>
@@ -11,7 +11,7 @@
 
 ## Controles
 
-
+Se puede insertar &to=<user>&from=<user> para un tag personalizado c: 
 | Tecla | Qué hace |
 | :---: | :--- |
 | <kbd>W</kbd> | cambia el color de la mariposa |
@@ -23,5 +23,5 @@
 <br>
 
 <p align="center">
-  <sub>hecho con cariño, una flor a la vez</sub>
+  <sub>una flor a la vez</sub>
 </p>

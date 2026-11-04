@@ -44,6 +44,7 @@ una flor son **6 piezas con la misma forma** (`bezierCurveTo`), rotados `k * 60Â
  1 pixel = 1 celda         max(r, g, b)            + glow con blur
 ```
 ' .:-=+*cxoaX#%&@'`: `de poca luz (`.`) a mucha (`@`)
+un punto oscuro se vuelve un `.` y uno clarito se vuelve un `@`. 
 
 ## parametros de la url
 

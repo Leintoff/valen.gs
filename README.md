@@ -64,7 +64,7 @@ un punto oscuro se vuelve un `.` y uno clarito se vuelve un `@`.
 ejemplo para mandar con mensaje:
  
 ```
-index.html?to=Mati&msg=feliz%20cumple&from=Valen&ui=off
+https://leintoff.github.io/valen.gs/?to=Mati&msg=feliz%20cumple&from=Valen&ui=off
 ```
  
 

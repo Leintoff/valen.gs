@@ -32,7 +32,7 @@ cada flor deriva tres valores de `T` en `budState()`:
 | :--- | :--- |
 | `grow` | tamaño-estado de flor |
 | `blush` | color: verde a rosado |
-| `open` | apertura de los tépalos |
+| `open` | apertura de los petalos |
 
 
 una flor son **6 piezas con la misma forma** (`bezierCurveTo`), rotados `k * 60° * open`. abrir la flor es, literalmente, rotarlos hacia afuera. el color se interpola en RGB con `mix()`: verde, rosa polvo y color final.
